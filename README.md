@@ -1,57 +1,63 @@
-# 🔴 RedButtonQuit
+# RedButtonQuit
 
-A lightweight macOS utility for Apple Silicon that lets you **right-click the red close button** of any window to **quit the entire application** (instead of just closing that window).
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![macOS](https://img.shields.io/badge/macOS-13%2B-blue)](https://www.apple.com/macos/)
+[![Swift](https://img.shields.io/badge/Swift-5.9-orange)](https://swift.org)
 
-## How It Works
+A lightweight macOS menu bar utility for Apple Silicon that lets you **right-click the red close button** of any window to **quit the entire application** — instead of just closing that window.
 
-The app installs a global event tap that monitors right-click events. When you right-click on a window's red close button (identified via the macOS Accessibility API as `AXCloseButton`), it sends a quit signal to the owning application.
+## Why?
+
+On macOS, clicking the red close button closes the window but often leaves the app running in the background. RedButtonQuit gives you a natural way to fully quit an app: just **right-click** the red button instead.
 
 - **Left-click** the red button → closes the window (normal behavior)
 - **Right-click** the red button → **quits the entire application**
+
+## How It Works
+
+RedButtonQuit installs a global event tap that monitors right-click events. When you right-click on a window's red close button (identified via the macOS Accessibility API as `AXCloseButton`), it sends a quit signal to the owning application. It runs silently in the menu bar with a small red circle icon.
 
 ## Requirements
 
 - macOS 13 (Ventura) or later
 - Apple Silicon Mac (arm64)
-- Swift 5.9+ (included with Xcode or Xcode Command Line Tools)
+- Xcode Command Line Tools
 
 ## Installation
 
-### 1. Install Xcode Command Line Tools (if not already installed)
+### 1. Install Xcode Command Line Tools (if needed)
 
 ```bash
 xcode-select --install
 ```
 
-### 2. Build
+### 2. Clone and build
 
 ```bash
-chmod +x build.sh
+git clone https://github.com/vovakatz/RedButtonQuit.git
+cd RedButtonQuit
 ./build.sh
 ```
 
-This compiles the app and places the binary at `~/.local/bin/RedButtonQuit`.
+This compiles the app and creates `RedButtonQuit.app` in `~/Applications/`.
 
 ### 3. Run
 
 ```bash
-~/.local/bin/RedButtonQuit
+open ~/Applications/RedButtonQuit.app
 ```
 
 On first launch, macOS will prompt you to grant **Accessibility permissions**:
 
-> **System Settings → Privacy & Security → Accessibility**
+> **System Settings → Privacy & Security → Accessibility** → Enable **RedButtonQuit**
 
-Add and enable `RedButtonQuit` (or Terminal, if running from Terminal).
-
-### 4. (Optional) Auto-Start on Login
+### 4. Auto-start on login (optional)
 
 ```bash
-chmod +x install-launchagent.sh
 ./install-launchagent.sh
 ```
 
-This installs a LaunchAgent so RedButtonQuit starts automatically when you log in.
+This installs a LaunchAgent so RedButtonQuit starts automatically when you log in. Logs are written to `~/Library/Logs/RedButtonQuit.log`.
 
 ## Uninstall
 
@@ -60,13 +66,16 @@ This installs a LaunchAgent so RedButtonQuit starts automatically when you log i
 launchctl unload ~/Library/LaunchAgents/com.user.redbuttonquit.plist
 rm ~/Library/LaunchAgents/com.user.redbuttonquit.plist
 
-# Remove the binary
-rm ~/.local/bin/RedButtonQuit
+# Remove the app
+rm -rf ~/Applications/RedButtonQuit.app
 ```
 
 ## Notes
 
-- The app runs silently in the background and logs activity to the terminal (or `~/Library/Logs/RedButtonQuit.log` if using the LaunchAgent).
-- If running from Terminal, you need to grant Accessibility permissions to **Terminal.app** (or your terminal emulator like iTerm2).
-- If running as a standalone binary, grant permissions to the binary itself.
-- `Ctrl+C` stops the app when running in a terminal.
+- The app runs as a menu bar utility (no Dock icon). Click the red circle icon in the menu bar to quit.
+- If Accessibility permissions aren't granted, the app will prompt you and exit.
+- The app attempts a graceful quit first, falling back to force-quit if needed.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
